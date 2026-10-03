@@ -1,0 +1,8 @@
+{
+  "name": "Remix AIK - Diseñando el Espacio Digital del Mañana",
+  "description": "Plataforma de formación docente e integración pedagógica de tablets e IA en bachillerato por AIK Soluciones Estratégicas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
