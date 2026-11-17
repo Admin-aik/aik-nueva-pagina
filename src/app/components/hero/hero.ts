@@ -17,6 +17,8 @@ interface ShowcaseImage {
   subtitle: string;
   serviceCategory: string;
   highlights: string[];
+  objectPosition: string;
+  isPortrait?: boolean;
 }
 
 @Component({
@@ -40,8 +42,8 @@ interface ShowcaseImage {
           (mouseleave)="onMouseLeave()"
         >
           <!-- Contenedor Panorámico a Todo lo Ancho con Bordes Curvos y Sombra -->
-          <div class="relative w-full rounded-3xl overflow-hidden border-2 border-slate-200/90 shadow-2xl bg-slate-950 aspect-16/9 sm:aspect-21/9 max-h-[500px] group">
-            <!-- Slides con Transición Suave y Fotografía en Alta Calidad Panorámica -->
+          <div class="relative w-full rounded-3xl overflow-hidden border-2 border-slate-200/90 shadow-2xl bg-slate-950 aspect-16/9 min-h-[340px] max-h-[600px] group">
+            <!-- Slides con Transición Suave y Fotografía en Alta Resolución respetando literalmente cada rostro -->
             @for (item of showcaseList; track item.id; let idx = $index) {
               <div
                 class="absolute inset-0 transition-opacity duration-700 ease-in-out"
@@ -49,12 +51,29 @@ interface ShowcaseImage {
                 [class.opacity-0]="currentIndex() !== idx"
                 [class.pointer-events-none]="currentIndex() !== idx"
               >
-                <img
-                  [src]="item.src"
-                  [alt]="item.title"
-                  referrerpolicy="no-referrer"
-                  class="w-full h-full object-cover object-center scale-100 group-hover:scale-102 transition-transform duration-7000 ease-out"
-                />
+                @if (item.isPortrait) {
+                  <img
+                    [src]="item.src"
+                    alt=""
+                    aria-hidden="true"
+                    referrerpolicy="no-referrer"
+                    class="absolute inset-0 w-full h-full object-cover object-center blur-2xl scale-110 opacity-55 brightness-75"
+                  />
+                  <img
+                    [src]="item.src"
+                    [alt]="item.title"
+                    referrerpolicy="no-referrer"
+                    class="relative z-10 w-full h-full object-contain object-center drop-shadow-2xl transition-transform duration-7000 ease-out"
+                  />
+                } @else {
+                  <img
+                    [src]="item.src"
+                    [alt]="item.title"
+                    referrerpolicy="no-referrer"
+                    [style.object-position]="item.objectPosition"
+                    class="w-full h-full object-cover scale-100 group-hover:scale-102 transition-transform duration-7000 ease-out"
+                  />
+                }
               </div>
             }
 
@@ -103,22 +122,23 @@ interface ShowcaseImage {
             }
           </div>
 
-          <!-- Selector de Miniaturas Panorámico (5 diapositivas) -->
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3 pt-1">
+          <!-- Selector de Miniaturas Panorámico (6 diapositivas) -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3 pt-1">
             @for (item of showcaseList; track item.id; let idx = $index) {
               <button
                 type="button"
                 (click)="selectSlide(idx)"
                 [class]="currentIndex() === idx ? 'ring-2 ring-indigo-600 scale-101 border-indigo-600 shadow-md opacity-100' : 'opacity-70 hover:opacity-100 border-slate-200'"
-                class="relative rounded-2xl overflow-hidden border aspect-16/8 transition-all cursor-pointer group"
+                class="relative rounded-2xl overflow-hidden border aspect-16/9 transition-all cursor-pointer group bg-slate-900"
               >
                 <img
                   [src]="item.src"
                   [alt]="item.title"
                   referrerpolicy="no-referrer"
-                  class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                  [style.object-position]="item.objectPosition"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div class="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/15 to-transparent group-hover:from-slate-950/50 transition-colors"></div>
 
                 @if (currentIndex() === idx && isAutoPlay()) {
                   <div class="absolute top-0 left-0 right-0 h-1 bg-indigo-600 z-10"></div>
@@ -1281,54 +1301,71 @@ export class Hero implements OnInit, OnDestroy {
 
   readonly showcaseList: ShowcaseImage[] = [
     {
-      id: 'seminario-edutech',
-      src: '/slider_seminario_edutech.jpg',
-      tag: 'Seminario Edutech',
-      tagColor: 'bg-blue-600',
-      serviceCategory: 'Herramientas Digitales & IA',
-      title: 'Innovación Docente en Vivo con Recursos y Herramientas Digitales',
-      subtitle: 'Demostración práctica de herramientas digitales, simuladores interactivos, prototipos de física y tecnologías aplicadas al aula escolar.',
-      highlights: ['Pantallas Interactivas', 'Edutech Connect', 'Prototipos STEAM', 'Simuladores y VR'],
+      id: 'aik-bienvenida-institucional',
+      src: '/assets/enhanced/slide_1_aik_bienvenida.jpg',
+      tag: 'Gestión y Liderazgo',
+      tagColor: 'bg-blue-700',
+      serviceCategory: 'Equipo Directivo AIK',
+      title: 'Liderazgo Pedagógico e Innovación Educativa en Venezuela',
+      subtitle: 'Facilitadores y directivos de AIK Soluciones Estratégicas promoviendo programas de formación docente, cultura digital y excelencia académica.',
+      highlights: ['Acompañamiento Directo', 'Identidad Nacional', 'Formación Presencial', 'Calidad Educativa'],
+      objectPosition: 'center 26%',
     },
     {
-      id: 'clase-online-historia',
-      src: '/slider_clase_online_historia.jpg',
-      tag: 'Aula Virtual en Vivo',
-      tagColor: 'bg-amber-600',
-      serviceCategory: 'Educación Híbrida y Online',
-      title: 'Docencia Virtual Interactiva y Aprendizaje Multimedial en Tiempo Real',
-      subtitle: 'Sesiones interactivas a distancia con recursos visuales, modelos históricos, videoconferencias participativas y apoyo digital.',
-      highlights: ['Videoconferencias Dinámicas', 'Recursos Multimediales', 'Doble Pantalla y Tablet', 'Participación Activa'],
+      id: 'identidad-historica-cultura',
+      src: '/assets/enhanced/slide_2_historia_cultura.jpg',
+      tag: 'Historia y Cultura',
+      tagColor: 'bg-rose-700',
+      serviceCategory: 'Humanidades & Identidad',
+      title: 'Vinculación Cultural e Histórica en Experiencias Formativas',
+      subtitle: 'Integración de recursos culturales, patrimonio histórico y pedagogía vivencial para conectar a docentes y estudiantes con nuestra identidad.',
+      highlights: ['Patrimonio e Historia', 'Aprendizaje Vivencial', 'Cultura Venezolana', 'Participación Activa'],
+      objectPosition: 'center 36%',
+      isPortrait: true,
     },
     {
-      id: 'capacitacion-docente-circulo',
-      src: '/slider_capacitacion_circulo.jpg',
-      tag: 'Capacitación Docente',
-      tagColor: 'bg-emerald-600',
-      serviceCategory: 'Servicio Principal AiK',
-      title: 'Círculos Pedagógicos de Formación Docente en Innovación Educativa',
-      subtitle: 'Mesas de trabajo colaborativo y diálogo formativo con educadores venezolanos bajo la Metodología Activa 60/40.',
-      highlights: ['Metodología 60/40', 'Diálogo Pedagógico', 'Docentes Venezolanos', 'Sin Requisito de Tablets'],
-    },
-    {
-      id: 'taller-docentes-venezuela',
-      src: '/slider_taller_docentes_venezuela.jpg',
-      tag: 'Talleres Prácticos',
+      id: 'facilitacion-digital-docente',
+      src: '/assets/enhanced/slide_3_facilitacion_digital.jpg',
+      tag: 'Facilitación Digital',
       tagColor: 'bg-indigo-600',
-      serviceCategory: 'Formación y Actualización',
-      title: 'Conferencias y Talleres Interactivos para el Magisterio',
-      subtitle: 'Facilitación presencial con retroalimentación continua, debate pedagógico y diseño curricular adaptado a la realidad de cada centro.',
-      highlights: ['Facilitadores Especializados', 'Interacción Directa', 'Evaluación por Evidencias', 'Adaptabilidad Curricular'],
+      serviceCategory: 'Tecnología & Currículo',
+      title: 'Diseño Curricular Asistido y Entornos Digitales de Aprendizaje',
+      subtitle: 'Preparación especializada de sesiones híbridas, creación de contenidos con Inteligencia Artificial y acompañamiento técnico al docente.',
+      highlights: ['Diseño con IA', 'Sesiones Híbridas', 'Soporte Pedagógico', 'Metodología 60/40'],
+      objectPosition: 'center 58%',
     },
     {
-      id: 'mesa-interactiva-estudiantes',
-      src: '/slider_mesa_interactiva_estudiantes.jpg',
-      tag: 'Estudiantes Activos',
-      tagColor: 'bg-purple-600',
-      serviceCategory: 'Ciencias & Colaboración',
-      title: 'Aprendizaje Activo en Ciencias con Pantallas Táctiles e Interactivas',
-      subtitle: 'Jóvenes de liceo explorando modelos biológicos tridimensionales y resolviendo retos científicos guiados por sus docentes.',
-      highlights: ['Mesas Táctiles Interactivas', 'Modelos 3D en Ciencias', 'Investigación en Equipo', 'Guía Docente Acompañada'],
+      id: 'equipo-alianzas-aik',
+      src: '/assets/enhanced/slide_4_equipo_aik.jpg',
+      tag: 'Alianzas AIK',
+      tagColor: 'bg-emerald-600',
+      serviceCategory: 'Cooperación Institucional',
+      title: 'Alianzas Estratégicas con Instituciones y Centros de Formación',
+      subtitle: 'Trabajo articulado entre especialistas de AIK y aliados institucionales para impulsar la transformación digital del magisterio.',
+      highlights: ['Alianzas Educativas', 'Trabajo Colaborativo', 'Impacto Social', 'Gestión Estratégica'],
+      objectPosition: 'center 52%',
+    },
+    {
+      id: 'ponencia-pantalla-interactiva',
+      src: '/assets/enhanced/slide_5_ponencia_pantalla.jpg',
+      tag: 'Ponencia en Vivo',
+      tagColor: 'bg-cyan-700',
+      serviceCategory: 'Conferencias & IA',
+      title: 'Ponencias Magistrales de Inteligencia Artificial y Tecnología Aplicada',
+      subtitle: 'Demostraciones en vivo sobre herramientas de IA generativa, programación y metodologías activas frente a audiencias docentes y técnicas.',
+      highlights: ['Pantalla Interactiva', 'IA Generativa en Vivo', 'Casos Reales', 'Alta Participación'],
+      objectPosition: 'center 54%',
+    },
+    {
+      id: 'auditorio-taller-presencial',
+      src: '/assets/enhanced/slide_6_auditorio_taller.jpg',
+      tag: 'Taller en Auditorio',
+      tagColor: 'bg-purple-700',
+      serviceCategory: 'Jornadas Presenciales',
+      title: 'Jornadas Masivas de Capacitación Docente y Debate Pedagógico',
+      subtitle: 'Encuentros formativos presenciales con amplia convocatoria, interacción directa y construcción colectiva de soluciones educativas.',
+      highlights: ['Aforo Completo', 'Facilitación Activa', 'Debate Constructivo', 'Alcance Nacional'],
+      objectPosition: 'center 56%',
     },
   ];
 
